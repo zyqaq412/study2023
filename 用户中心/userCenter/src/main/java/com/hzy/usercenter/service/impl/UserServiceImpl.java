@@ -2,6 +2,7 @@ package com.hzy.usercenter.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.hzy.usercenter.contant.UserConstant;
 import com.hzy.usercenter.entity.User;
 import com.hzy.usercenter.mapper.UserMapper;
 import com.hzy.usercenter.service.UserService;
@@ -23,7 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
     private static final String SALT = "zy";
-    private static final String USER_LOGIN_STATE = "userLoginState";
+
 
     @Override
     public long userRegister(String userAccount, String userPassword, String checkPassword) {
@@ -69,7 +70,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             return null;
         }
         // 记录用户登录态
-        request.getSession().setAttribute(USER_LOGIN_STATE,user);
+        request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE,user);
 
         return user;
     }

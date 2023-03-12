@@ -47,6 +47,9 @@ public class User  {
     @TableLogic
     private Integer isdelete;
 
+    // 0普通用户，1管理员
+    private Integer role;
+
 
 
 }
