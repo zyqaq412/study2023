@@ -3,6 +3,8 @@ package com.hzy.usercenter.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hzy.usercenter.entity.User;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * @title: UserService
  * @Author zxwyhzy
@@ -18,4 +20,13 @@ public interface UserService extends IService<User> {
      * @return 用户id
      */
     long userRegister (String userAccount,String userPassword,String checkPassword);
+
+    /**
+     *  用户登录
+     * @param userAccount 用户账户
+     * @param userPassword 用户密码
+     * @param request 请求
+     * @return 脱敏后的用户信息
+     */
+    User doLogin(String userAccount, String userPassword, HttpServletRequest request);
 }

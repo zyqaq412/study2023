@@ -5,9 +5,12 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hzy.usercenter.entity.User;
 import com.hzy.usercenter.mapper.UserMapper;
 import com.hzy.usercenter.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @title: UserServiceImpl
@@ -16,7 +19,12 @@ import org.springframework.util.DigestUtils;
  * @Version 1.0
  */
 @Service
+@Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
+
+    private static final String SALT = "zy";
+    private static final String USER_LOGIN_STATE = "userLoginState";
+
     @Override
     public long userRegister(String userAccount, String userPassword, String checkPassword) {
         // 校验
@@ -33,7 +41,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (userPassword.equals(checkPassword)){
             User user = new User();
             user.setUseraccount(userAccount);
-            final String SALT = "zy";
             String password = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
             user.setUserpassword(password);
             boolean save = save(user);
@@ -44,5 +51,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
 
         return -1;
+    }
+
+    @Override
+    public User doLogin(String userAccount, String userPassword, HttpServletRequest request) {
+        if(StringUtils.isAnyBlank(userAccount,userPassword)){
+            return null;
+        }
+        userPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
+
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userAccount",userAccount);
+        queryWrapper.eq("userPassword",userPassword);
+        User user = getOne(queryWrapper);
+        if (null == user) {
+            log.info("user login failed, userAccount cannot match userPassword");
+            return null;
+        }
+        // 记录用户登录态
+        request.getSession().setAttribute(USER_LOGIN_STATE,user);
+
+        return user;
     }
 }
